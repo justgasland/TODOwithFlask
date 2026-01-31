@@ -56,7 +56,7 @@ def addTodo():
 
 @app.route("/todo/<int:item>", methods=["PUT"])
 def update_todo(item):
-    for i, todo_item in enumerate(todo):
+    for  todo_item in todo:
         if todo_item['id'] == item:
             if 'title' not in request.json:
                 return jsonify({"message": "TITLE IS REQUIRED"}), 400
@@ -74,12 +74,31 @@ def update_todo(item):
             if len(desc) > 1000:
                 return jsonify({"message": "DESCRIPTION CANNOT EXCEED 1000 CHARACTERS"}), 400
 
-            todo[i] = {
+            todo_update = {
                 'id': item,
                 'title': title,
                 'description': desc,
                 'created_at': todo_item['created_at'],
                 'updated_at': current_time,
             }
+            todo.append(todo_update)
+            todo.remove(todo_item)
             return jsonify({"message": "Todo item updated successfully"}), 201
     return jsonify({"message": "No todo item with that Id found, try again"}), 404
+
+
+@app.route("/todo/<int:item>", methods=["DELETE"])
+def delete_todo(item):
+    for  todo_item in todo:
+        if todo_item['id'] == item:
+            todo.remove(todo_item)
+            return jsonify({"message": "Todo item deleted successfully"}), 200
+    return jsonify({"message": "No todo item with that Id found, try again"}), 404
+
+
+@app.route('/')
+def welcome():
+    return "Welcome to the Todo API Service"
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
